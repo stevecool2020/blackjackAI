@@ -22,12 +22,13 @@ bj = QuickMDP(
         if s == -1
             return Deterministic(s)
 
-        elseif s > 21
+        elseif s >= 21
             return Deterministic(-1)
+             
         elseif a == :hit
             return Uniform(s .+ [1,2,3,4,5,6,7,8,9,10])
         elseif a == :stay
-            return Deterministic(s)
+            return Deterministic(-1)
         end
     end,
 
@@ -40,7 +41,9 @@ bj = QuickMDP(
             return 0.0
         end
     end,
-    
+    observation = function (s, a, sp)
+        return s
+    end,
 
     initialstate = Uniform([1,2,3,4,5,6,7,8,9,10]),
     discount = 1.0,
@@ -48,6 +51,6 @@ bj = QuickMDP(
 )
 
 # evaluate with a always wait policy
-policy = FunctionPolicy(a->rand(POMDPs.actions(bj)))
+policy = FunctionPolicy(a->POMDPs.actions(bj)[1]) # always hit policy 
 sim = RolloutSimulator(max_steps=100)
 @show [POMDPs.simulate(sim, bj, policy) for _ in 1:100]
